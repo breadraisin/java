@@ -1,0 +1,20 @@
+package co.yedam.test;
+
+public class CalcExample {
+
+	public static void main(String[] args) {
+		Calc calc = new Calc();
+		
+		calc.turnOn();
+		
+		calc.sum(10,20);
+		calc.sum(10.5,20.5);
+
+		
+		int r = calc.sum2(100, 200);
+		System.out.println("두수의 합:" + r);
+		
+		System.out.println("모든수의 합:" + calc.sum3(1,2,3,4,5));
+	}
+
+}
