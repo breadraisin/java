@@ -1,8 +1,10 @@
-package 숙제;
+package abc;
 
 import java.util.Scanner;
-
-public class RentService implements Service{
+/*
+ * 객체배열을 이용한 도서정보 등록/수정/삭제/조회 기능 구현
+ */
+public class BookService implements Service{
 	
 	Book[] books;
 	int cnt;			//입력건수

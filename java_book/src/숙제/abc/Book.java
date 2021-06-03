@@ -1,4 +1,4 @@
-package 숙제;
+package abc;
 
 public class Book {
 	private String title;

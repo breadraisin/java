@@ -1,4 +1,4 @@
-package 숙제;
+package abc;
 
 import java.util.Scanner;
 
