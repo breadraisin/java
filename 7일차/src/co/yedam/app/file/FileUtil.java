@@ -4,12 +4,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-public class FileCopyTest {
-	public static void main(String[] args) {
+public class FileUtil {
+	public static void copy(String src, String des) {
 		//파일복사
 		try {
-			FileInputStream fis = new FileInputStream("d:/temp/img.jpg");
-			FileOutputStream fos = new FileOutputStream("d:/temp/img1.jpg");
+			FileInputStream fis = new FileInputStream(src);
+			FileOutputStream fos = new FileOutputStream(des);
 			
 			int b;
 			while(true){  //while 안에 (b = fis.read()) != -1 

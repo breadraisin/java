@@ -3,7 +3,6 @@ package co.memo.util;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
-import co.friend.model.Friend;
 import co.memo.model.Memo;
 
 public class ScannerUtil2 {

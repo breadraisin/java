@@ -85,7 +85,7 @@ public class FriendGuiApp extends JFrame {
 
 	// 삭제
 	public void delete() {
-		String name = txtTel.getText();
+		String name = txtName.getText();
 		friendList.delete(name);
 	}
 
