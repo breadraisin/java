@@ -28,13 +28,11 @@ public class FriendDAO extends DAO implements FriendAccess { //프렌드엑세�
 			while(rs.next()) {
 				info.put(rs.getString("name"), rs.getString("tel"));
 			}
-		
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		
+	
 		return info;
 	}
 	

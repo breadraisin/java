@@ -8,8 +8,8 @@ public class AppMain {
 	public static void main(String[] args) {
 		//FriendCliApp app = new FriendCliApp();
 		//app.start();
-		//new FriendCliApp().start(); //메소드 체인
-		new FriendGuiApp();
+		new FriendCliApp().start(); //메소드 체인
+		//new FriendGuiApp();
 
 	}
 
