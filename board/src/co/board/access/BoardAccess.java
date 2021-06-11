@@ -16,8 +16,19 @@ public interface BoardAccess {
 	public void update(Board board);
 	
 	//4.글 삭제
-	public void delete(String b_id);
+	public void delete(int b_id);
 	
 	//5.한건 조회
-	public Board selectOne(String b_id);
+	public Board selectOne(int b_id);
+	
+	//6.댓글
+	public void insertD(Board board);
+	public Board selectOneD();
+	
+	//7.로그인
+	public boolean login(String u_id, String u_pass);
+
+
+	
+	
 }

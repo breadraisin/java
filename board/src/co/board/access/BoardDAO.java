@@ -23,13 +23,10 @@ public class BoardDAO extends DAO implements BoardAccess{
 			rs = psmt.executeQuery();
 			while(rs.next()) {
 				Board board = new Board();
-				board.setB_id(rs.getString("b_id"));
+				board.setB_id(rs.getInt("b_id"));
 				board.setB_title(rs.getString("b_title"));
-				board.setB_content(rs.getString("b_content"));
 				board.setB_writer(rs.getString("b_writer"));
 				bList.add(board);
-				
-				
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -56,7 +53,7 @@ public class BoardDAO extends DAO implements BoardAccess{
 		try {
 			psmt = conn.prepareStatement("update board set b_content=? where b_id=? ");
 			psmt.setString(1, board.getB_content());
-			psmt.setString(2, board.getB_id());
+			psmt.setInt(2, board.getB_id());
 			int r = psmt.executeUpdate();
 			} catch (SQLException e) {
 			e.printStackTrace();
@@ -65,10 +62,10 @@ public class BoardDAO extends DAO implements BoardAccess{
 	}
 
 	@Override
-	public void delete(String b_id) {
+	public void delete(int b_id) {
 		try {
 			psmt = conn.prepareStatement("delete from board where b_id=?");
-			psmt.setString(1, b_id);
+			psmt.setInt(1, b_id);
 			int r = psmt.executeUpdate();
 
 		} catch (SQLException e) {
@@ -77,15 +74,15 @@ public class BoardDAO extends DAO implements BoardAccess{
 	}
 
 	@Override
-	public Board selectOne(String b_id) {
+	public Board selectOne(int b_id) {
 		Board b = null;
 		try {
 			psmt = conn.prepareStatement("select * from board where b_id = ?");
-			psmt.setString(1, b_id);
+			psmt.setInt(1, b_id);
 			rs = psmt.executeQuery();
 			while(rs.next()) {
 				b = new Board();
-				b.setB_id(rs.getString("b_id"));
+				b.setB_id(rs.getInt("b_id"));
 				b.setB_title(rs.getString("b_title"));
 				b.setB_writer(rs.getString("b_writer"));
 				b.setB_content(rs.getString("b_content"));
@@ -95,4 +92,69 @@ public class BoardDAO extends DAO implements BoardAccess{
 		}
 		return b;
 	}
+
+	public void insertD(Board board) {
+		try {
+			psmt =  conn.prepareStatement("insert into board(b_title,b_content,b_writer,b_parentid) values('댓글',?,'댓글 작성자',?)");
+			psmt.setString(1, board.getB_content());
+			psmt.setInt(2, board.getB_parentid());
+			int r = psmt.executeUpdate();
+			if(r != 0) {
+				System.out.println("댓글성공");
+			}else {
+				System.out.println("댓글실패");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public Board selectOneD() {
+		Board b = null;
+		try {
+			psmt = conn.prepareStatement("select * from board where b_parentid is not null");
+			rs = psmt.executeQuery();
+			while(rs.next()) {
+				b = new Board();
+				b.setB_id(rs.getInt("b_parentid"));
+				//b.setB_title(rs.getString("b_title"));
+				//b.setB_writer(rs.getString("b_writer"));
+				b.setB_content(rs.getString("b_content"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return b;
+	}
+
+	@Override
+	
+	public boolean login(String u_id, String u_pass) {
+			
+		boolean idps = false;
+		
+		try {
+			psmt = conn.prepareStatement(" select * from member where u_id = ?, u_pass = ? ");
+			psmt.setString(1, u_id);
+			psmt.setString(2, u_pass);
+			rs = psmt.executeQuery();
+			
+			if(rs.next()) {
+				idps = true;
+				
+			}else {
+				idps = false;
+				
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return idps;
+	}
+
 }
+
