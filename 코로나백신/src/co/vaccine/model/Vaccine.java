@@ -14,6 +14,23 @@ public class Vaccine {
 	public Vaccine() {}
 	
 	
+	public Vaccine(String type) {
+		super();
+		this.type = type;
+	}
+
+
+	public Vaccine(String id, String pass, String name, String age, String address, String phone) {
+		super();
+		this.id = id;
+		this.pass = pass;
+		this.name = name;
+		this.age = age;
+		this.address = address;
+		this.phone = phone;
+	}
+
+
 	public Vaccine(String id, String pass, String name, String age, String address, String phone, String type) {
 		super();
 		this.id = id;
@@ -72,8 +89,8 @@ public class Vaccine {
 
 	@Override
 	public String toString() {
-		return "Vaccine [ id=" + id + ", pass=" + pass + ", name=" + name + ", age=" + age
-				+ ", address=" + address + ", phone=" + phone + ", type=" + type + "]";
+		return "Vaccine [ id: " + id + ", pass: " + pass + ", 이름: " + name + ", 주민번호 앞자리: " + age
+				+ ", 소재지: " + address + ", 폰번호: " + phone + ", 접종여부: " + type + "]";
 	}
 	
 	
