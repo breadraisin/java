@@ -9,17 +9,9 @@ public class Vaccine {
 	protected String age;
 	protected String address;
 	protected String phone;
-	protected String type;
 	
 	public Vaccine() {}
 	
-	
-	public Vaccine(String type) {
-		super();
-		this.type = type;
-	}
-
-
 	public Vaccine(String id, String pass, String name, String age, String address, String phone) {
 		super();
 		this.id = id;
@@ -38,10 +30,12 @@ public class Vaccine {
 		this.name = name;
 		this.age = age;
 		this.address = address;
-		this.phone = phone;
-		this.type = type;
-	}
+		this.phone = phone;	}
 
+	public Vaccine(String age) {
+		super();
+		this.age = age;
+	}
 
 
 	public String getId() {
@@ -80,17 +74,11 @@ public class Vaccine {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public String getType() {
-		return type;
-	}
-	public void setType(String type) {
-		this.type = type;
-	}
 
 	@Override
 	public String toString() {
-		return "Vaccine [ id: " + id + ", pass: " + pass + ", 이름: " + name + ", 주민번호 앞자리: " + age
-				+ ", 소재지: " + address + ", 폰번호: " + phone + ", 접종여부: " + type + "]";
+		return "Vaccine [ 이름: " + name + ", 주민번호 앞자리: " + age
+				+ ", 지역: " + address + ", 폰번호: " + phone +  "]";
 	}
 	
 	

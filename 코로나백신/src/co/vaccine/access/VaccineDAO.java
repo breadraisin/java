@@ -17,29 +17,7 @@ public class VaccineDAO implements VaccineAccess {
 	ResultSet rs;
 	static Connection conn;
 	
-	//회원가입
-	@Override
-	public void signUp(Vaccine vaccine) {
-		connect();
-		try {
-			psmt = conn.prepareStatement("insert into vaccineInfo(id,pass,name,age,address,phone) values (?,?,?,?,?,?)");
-			psmt.setString(1, vaccine.getId());
-			psmt.setString(2, vaccine.getPass());
-			psmt.setString(3, vaccine.getName());
-			psmt.setString(4, vaccine.getAge());
-			psmt.setString(5, vaccine.getAddress());
-			psmt.setString(6, vaccine.getPhone());
-			int r = psmt.executeUpdate();
-			System.out.println("입력되었습니다.");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			close();
-		}
-		
-	}
-	
-	//회원 로그인
+	// 회원 로그인
 	public boolean logIn(String id, String pass) {
 		connect();
 		boolean log = false;
@@ -60,8 +38,54 @@ public class VaccineDAO implements VaccineAccess {
 		}
 		return log;
 	}
+
+	// 회원가입
+	@Override
+	public void signUp(Vaccine vaccine) {
+		connect();
+		try {
+			psmt = conn
+					.prepareStatement("insert into vaccineInfo(id,pass,name,age,address,phone) values (?,?,?,?,?,?)");
+			psmt.setString(1, vaccine.getId());
+			psmt.setString(2, vaccine.getPass());
+			psmt.setString(3, vaccine.getName());
+			psmt.setString(4, vaccine.getAge());
+			psmt.setString(5, vaccine.getAddress());
+			psmt.setString(6, vaccine.getPhone());
+			int r = psmt.executeUpdate();
+			System.out.println("입력되었습니다.");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+
+	}
+
+	// 관리자 로그인
+	@Override
+	public boolean managerlogIn(String m_id, String m_pass) {
+		connect();
+		boolean log2 = false;
+		try {
+			psmt = conn.prepareStatement("select * from manager where m_id =? and m_pass = ?");
+			psmt.setString(1, m_id);
+			psmt.setString(2, m_pass);
+			rs = psmt.executeQuery();
+			if (rs.next()) {
+				log2 = true;
+			} else {
+				log2 = false;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		return log2;
+	}
 	
-	//병원 조회
+	//예약 병원 조회
 	@Override
 	public ArrayList<Hospital> select(String h_address) {
 		connect();
@@ -75,6 +99,7 @@ public class VaccineDAO implements VaccineAccess {
 				hospital.setH_id(rs.getInt("h_id"));
 				hospital.setH_address(rs.getString("h_address"));
 				hospital.setH_name(rs.getString("h_name"));
+				hospital.setH_phone(rs.getString("h_phone"));
 				hList.add(hospital);
 			
 			}
@@ -86,7 +111,7 @@ public class VaccineDAO implements VaccineAccess {
 		return hList;              
 	}
 	
-	//병원 예약
+	//예약 입력
 	public void insert(Reservation reserves) {
 		connect();
 		try {
@@ -128,51 +153,69 @@ public class VaccineDAO implements VaccineAccess {
 		return re;              
 	}
 	
-	//관리자 로그인
-	@Override
-	public boolean managerlogIn(String m_id, String m_pass) {
+	//병원등록
+	public void insert2(Hospital hospital) {
 		connect();
-		boolean log2 = false;
 		try {
-			psmt = conn.prepareStatement("select * from manager where m_id =? and m_pass = ?");
-			psmt.setString(1, m_id);
-			psmt.setString(2, m_pass);
-			rs = psmt.executeQuery();
-			if (rs.next()) {
-				log2 = true;
-			} else {
-				log2 = false;
-			}
+			psmt = conn.prepareStatement("insert into hospital(h_address,h_name,h_phone) values (?,?,?)");
+			psmt.setString(1, hospital.getH_address());
+			psmt.setString(2, hospital.getH_name());
+			psmt.setString(3, hospital.getH_phone());
+			int r = psmt.executeUpdate();
+			System.out.println("등록되었습니다.");
+			
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
+		}finally {
 			close();
 		}
-		return log2;
 	}
 	
-	@Override
-	public ArrayList<Reservation> selectAll2() {
+	//병원수정
+	public void update2(Hospital hospital) {
 		connect();
-		ArrayList<Reservation> rList = new ArrayList<Reservation>();
 		try {
-			psmt = conn.prepareStatement("select * from reservation");
+			psmt = conn.prepareStatement("update hospital set h_phone = ? where h_name = ?");
+			psmt.setString(1, hospital.getH_phone());
+			psmt.setString(2, hospital.getH_name());
+			int r = psmt.executeUpdate();
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			close();
+		}
+	}
+	
+
+	//병원리스트
+	@Override
+	public ArrayList<Hospital> selecth() {
+		connect();
+		ArrayList<Hospital> hList1 = new ArrayList<Hospital>();
+		try {
+			psmt = conn.prepareStatement("select * from hospital");
 			rs = psmt.executeQuery();
 			while(rs.next()) {
-				Reservation reserves = new Reservation();
-				reserves.setH_name(rs.getString("h_name"));
-				reserves.setU_name(rs.getString("u_name"));
-				reserves.setDay(rs.getString("day"));
-				rList.add(reserves);
+				Hospital hospital = new Hospital();
+				hospital.setH_id(rs.getInt("h_id"));
+				hospital.setH_address(rs.getString("h_address"));
+				hospital.setH_name(rs.getString("h_name"));
+				hospital.setH_phone(rs.getString("h_phone"));
+				hList1.add(hospital);
+			
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally {
 			close();
 		}
-		return rList;                                                  
+		return hList1;              
 	}
+	
 
+	//회원리스트
 	@Override
 	public ArrayList<Vaccine> selectAll() {
 		connect();
@@ -184,8 +227,8 @@ public class VaccineDAO implements VaccineAccess {
 				Vaccine vaccine = new Vaccine();
 				vaccine.setName(rs.getString("name"));
 				vaccine.setAge(rs.getString("age"));
+				vaccine.setAddress(rs.getString("address"));
 				vaccine.setPhone(rs.getString("phone"));
-				vaccine.setType(rs.getString("type"));
 				vList.add(vaccine);
 			}
 		} catch (SQLException e) {
@@ -196,22 +239,31 @@ public class VaccineDAO implements VaccineAccess {
 		return vList;                                                  
 	}
 	
-	@Override
-	public void update(Vaccine vaccine) {
-		connect();
-		try {
-			psmt = conn.prepareStatement("update vaccineInfo set type = ? where age = ?");
-			psmt.setString(1, vaccine.getType());
-			psmt.setString(2,vaccine.getAge());
-			int r = psmt.executeUpdate();
-		
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			close();
+	//회원검색
+		@Override
+		public Vaccine selectOne(String age) {
+			connect();
+			Vaccine v = null;
+			try {
+				psmt = conn.prepareStatement("select * from vaccineInfo where age = ?");
+				psmt.setString(1, age);
+				rs = psmt.executeQuery();
+				while(rs.next()) {
+					v = new Vaccine();
+					v.setName(rs.getString("name"));
+					v.setAge(rs.getString("age"));
+					v.setAddress(rs.getString("address"));
+					v.setPhone(rs.getString("phone"));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}finally {
+				close();
+			}
+			return v;              
 		}
-	}
-
+		
+	//회원삭제
 	@Override
 	public void delete(String age) {
 		connect();
@@ -228,27 +280,6 @@ public class VaccineDAO implements VaccineAccess {
 		}
 	}
 	
-	@Override
-	public Vaccine selectOne(String age) {
-		connect();
-		Vaccine v = null;
-		try {
-			psmt = conn.prepareStatement("select * from vaccineInfo where age = ?");
-			psmt.setString(1, age);
-			rs = psmt.executeQuery();
-			while(rs.next()) {
-				v = new Vaccine();
-				v.setName(rs.getString("name"));
-				v.setType(rs.getString("type"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			close();
-		}
-		return v;              
-	}
-	
 	public static void connect() {
 		String url = "jdbc:sqlite:C:/sqlite/db/sample.db";
 		try {
@@ -258,6 +289,27 @@ public class VaccineDAO implements VaccineAccess {
 			System.out.println("<<<연결 실패>>>");
 		}
 	}
+	
+	// 나이값만 가져오기 
+	@Override
+	public Vaccine selectage(String id) {
+		connect();
+		Vaccine a = new Vaccine();
+		try {
+			psmt = conn.prepareStatement("select age from vaccineInfo where id = ? ");
+			psmt.setString(1, id);
+			rs = psmt.executeQuery();
+			while (rs.next()) {
+				a.setAge(rs.getString("age"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		return a;
+	}
+	
 	
 	// close
 	public void close() {
@@ -285,8 +337,45 @@ public class VaccineDAO implements VaccineAccess {
 
 	}
 
-	
+//예약전체조회
+	public ArrayList<Reservation> selectAll2() {
+		connect();
+		ArrayList<Reservation> rList = new ArrayList<Reservation>();
+		try {
+			psmt = conn.prepareStatement("select * from reservation");
+			rs = psmt.executeQuery();
+			while (rs.next()) {
+				Reservation reserves = new Reservation();
+				reserves.setH_name(rs.getString("h_name"));
+				reserves.setU_name(rs.getString("u_name"));
+				reserves.setDay(rs.getString("day"));
+				rList.add(reserves);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		return rList;
+	}
+
 }
 
+//회원수정
+//@Override
+//public void update(Vaccine vaccine) {
+//	connect();
+//	try {
+//		psmt = conn.prepareStatement("update vaccineInfo set type = ? where age = ?");
+//		psmt.setString(1, vaccine.getType());
+//		psmt.setString(2,vaccine.getAge());
+//		int r = psmt.executeUpdate();
+//	
+//	} catch (SQLException e) {
+//		e.printStackTrace();
+//	}finally {
+//		close();
+//	}
+//}
 	
 
