@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@WebServlet("/comments/CommentsServ")
+@WebServlet("/CommentsServ")
 public class CommentsServ extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -52,7 +52,24 @@ public class CommentsServ extends HttpServlet {
 			comment.setName(request.getParameter("name"));
 			HashMap<String, Object> map = CommentsDAO.getInstance().insert(comment);
 			out.println(toXML(map));
-		}
+		}else if (cmd.equals("update")) {
+			 response.setContentType("text/xml;charset=utf-8");
+			
+	         Comments comment = new Comments();
+	         comment.setId(request.getParameter("id"));
+	         comment.setName(request.getParameter("name"));
+	         comment.setContent(request.getParameter("content"));
+	         HashMap<String, Object> map = CommentsDAO.getInstance().update(comment);
+	         out.println(toXML(map));
+	     
+		} else if (cmd.equals("delete")) {
+	    	 response.setContentType("text/xml;charset=utf-8");
+				
+	         Comments comment = new Comments();
+	         comment.setId(request.getParameter("id"));
+	         HashMap<String, Object> map = CommentsDAO.getInstance().delete(comment);
+	         out.println(toXML(map));
+	     }
 	}
 	
 	private String toXML(HashMap<String, Object> map) {

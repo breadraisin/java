@@ -59,6 +59,56 @@ public class CommentsDAO extends DAO{
 		return map; // 처리된 결과 반환.
 	}
 	
+	//수정..
+		public HashMap<String, Object> update(Comments comment){
+			connect();
+			String sql = "update comments set name=?, content=? where id=?";
+			HashMap<String, Object> map = null;
+			try {
+				psmt = conn.prepareStatement(sql);
+				psmt.setString(1, comment.getName());
+				psmt.setString(2, comment.getContent());
+				psmt.setString(3, comment.getId());
+				int r = psmt.executeUpdate();
+				System.out.println(r + "건 수정됨.");
+				map = new HashMap<String, Object>();
+				map.put("id", comment.getId());
+				map.put("name", comment.getName());
+				map.put("content", comment.getContent());
+				map.put("code", "success");
+			
+			} catch (SQLException e) {
+				e.printStackTrace();
+				map = new HashMap<String, Object>();
+				map.put("code", "error");
+			}
+			return map;
+		}
+		
+		//삭제..
+				public HashMap<String, Object> delete(Comments comment){
+					connect();
+					String sql = "delete from comments where id=?";
+					HashMap<String, Object> map = null;
+					try {
+						psmt = conn.prepareStatement(sql);
+						psmt.setString(1, comment.getId());
+						int r = psmt.executeUpdate();
+						System.out.println(r + "건 수정됨.");
+						
+						map = new HashMap<String, Object>();
+						map.put("id", comment.getId());
+						map.put("code", "success");
+					
+					} catch (SQLException e) {
+						e.printStackTrace();
+						map = new HashMap<String, Object>();
+						map.put("code", "error");
+					}
+					return map;
+				}
+				
+	
 	//댓글목록
 	public List<HashMap<String, Object>> selectAll(){
 		connect();

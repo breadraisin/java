@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>comments_jquery.html</title>
+
+<script src="../js/jquery-3.6.0.min.js"></script>
+<script>
+   $(document).ready(function(){
+      loadCommentList();   
+   });
+	
+	
+   // 목록조회..
+   function loadCommentList() {
+       //ajax...호출..서블릿 호출..
+//     let xhtp = new XMLHttpRequest();
+//     xhtp.open('get', '../CommentsServ?cmd=selectAll');
+//      xhtp.send();
+//      xhtp.onreadystatechange = loadCommentResult;
+      
+      $.ajax({
+         url: '../CommentsServ', //요청페이지..
+         method: 'get',
+         data: {cmd: 'selectAll'}, //'cmd=selectAll'
+         success: loadCommentResult,
+         error: function() {
+            alert('에러발생!');
+         }
+      });
+   }
+	
+	//조회결과..
+	function loadCommentResult(result){
+			let xmp = new DOMParser();
+			let xmlDoc = xmp.parseFromString(result, 'text/xml');
+			let code = $(xmlDoc).find('code').html();
+			let listDiv = $('#commentList');
+			if(code == 'success'){
+				let commentList = eval($(xmlDoc).find('data').html());
+				for (let i = 0; i< commentList.length; i++){
+					listDiv.append(makeCommentView(commentList[i]));
+				} 
+			} else {
+				alert('에러발생!');
+			}
+			
+	//		console.log(code);
+			
+			//console.log(xmlDoc);
+			//let code = xmlDoc.getElementsByTagName('code')[0].innerHTML;
+			//let listDiv = document.getElementById('commentList');
+			//if (code == 'success'){
+				// let commentList = eval(xmlDoc.getElementsByTagName('data')[0].innerHTML);
+				// console.log(commentList);
+				// for(let i = 0; i< commentList.length; i++){
+				//	 listDiv.appendChild(makeCommentView(commentList[i]));
+				// }
+		//	}			
+		
+	}
+	
+	//한건을 화면보여줌.
+	function makeCommentView(comment) {
+		let div = $('<div />'); //document.createElement('div');
+		$(div).attr('id', comment.id); //div.setAttribute('id', comment.id);
+		$(div).addClass('comment'); //div.className = 'comment';
+		$(div).data('obj',comment);//div.comment = comment;	// {id:1,name:'user1',content='test'}
+		let str = '<strong>' + comment.name + '</strong>' + comment.content 
+				+ '<input type="button" value="수정" onclick="viewUpdateForm('+comment.id+')">'
+				+ '<input type="button" value="삭제" onclick="confirmDeletion('+comment.id+')">';
+		$(div).html(str);//div.innerHTML = str; // <div><strong>ddd</strong></div>
+		return div;
+	}
+	
+	//한건 등록..
+	function addComment(){
+		let name = addForm.name.value;
+		if (name == ""){
+			alert("이름 입력..");
+			addForm.name.focus();
+			return;
+		}
+		
+		let content = addForm.content.value;
+		if (content == ""){
+			alert("이름 입력..");
+			addForm.content.focus();
+			return;
+		}
+		//let param = "&name="+name+"&content="+content;
+		
+		//ajax 호출..
+		//let xhtp = new XMLHttpRequest();
+		//xhtp.open('get','CommentsServ?cmd=insert' + param);
+		//xhtp.send();
+		//xhtp.onreadystatechange = addResult;
+		
+		 $.ajax({
+	         url: '../CommentsServ', //요청페이지..
+	         method: 'get',
+	         data: {cmd: 'insert',
+	        	 name : name,
+	        	 content: content
+	        	 }, //'cmd=selectAll'
+	         success: addResult,
+	         error: function() {
+	            alert('에러발생!');
+	         }
+	      });
+		
+	}
+	
+	//등록 콜백 함수
+	
+	function addResult(result) {
+        // string -> xml
+        let xmp = new DOMParser();
+        let xmlDoc = xmp.parseFromString(result, 'text/xml');
+        let code = $(xmlDoc).find('code').html();
+        let listDiv = $('#commentList');
+        if (code == "success") {
+           let comment = JSON.parse($(xmlDoc).find('data').html());
+           listDiv.append(makeCommentView(comment));
+           addForm.name.value = '';
+           addForm.content.value = '';
+           alert("등록했습니다! [" + comment.id + "]");
+        } else if (code == "error") {
+           alert("에러발생!");
+        }
+        console.log(xmlDoc);
+     }
+	
+	//수정화면
+	function viewUpdateForm(commentId){
+		let commentDiv = $('#' + commentId); // document.getElementById(commentId); //
+		let updateFormDiv = $('#commentUpdate'); // document.getElementById('commentUpdate');
+		
+		$(commentDiv).after(updateFormDiv); //commentDiv.after(updateFormDiv); //수정화면에 id기준으로 정보를 보여줌.
+		let comment = $(commentDiv).data('obj'); //commentDiv.comment; // id, name, content 정보불러.
+		console.log(comment);
+		updateForm.id.value = comment.id;
+		updateForm.name.value = comment.name;
+		updateForm.content.value = comment.content;
+		$(updateFormDiv).css('display','block'); //updateFormDiv.style.display = 'block';
+	}
+	
+	//ajax 호출 수정.
+	function updateComment(){
+		const id = document.updateForm.id.value;
+		const name = document.updateForm.name.value;
+		const content = document.updateForm.content.value;
+	
+		 $.ajax({
+	         url: '../CommentsServ', //요청페이지..
+	         method: 'get',
+	         data: {cmd: 'update',
+	        	 id : id,
+	        	 name : name,
+	        	 content: content
+	        	 }, 
+	         success: updateResult,
+	         error: function() {
+	            alert('에러발생!');
+	         }
+	      });
+	}
+	
+	//ajax 호출 콜백 함수
+	function updateResult(result) {
+			console.log(result);
+			const xmlDoc = result;
+			const code = xmlDoc.getElementsByTagName('code')[0].firstChild.nodeValue;
+			if (code == 'success') {
+				const comment = JSON.parse($(xmlDoc).find('data').html());
+				const listDiv = $('#commentList'); //document.getElementById('commentList');
+				const commentDiv = makeCommentView(comment);
+				const oldCommentDiv = $('#'+ comment.id); //document.getElementById(comment.id);
+				oldCommentDiv.replaceWith(commentDiv);				
+				//listDiv.replaceChild(commentDiv, oldCommentDiv);
+				$('#commentUpdate').css('display','none');
+				//document.getElementById('commentUpdate').style.display = 'none';
+				alert("수정완료!");
+				
+			} else {
+				alert('에러발생!')
+			}
+		
+		
+	}
+	
+	//취소버튼.
+	function cancelUpdate(){
+		document.getElementById('commentUpdate').style.display = 'none';
+		
+	}
+	
+	//삭제처리
+	function confirmDeletion(id){
+		//const xhtp = new XMLHttpRequest();
+		//xhtp.open('get','CommentsServ?cmd=delete&id='+id);
+		//xhtp.send();
+		//xhtp.onreadystatechange = deleteResult;
+		
+		  $.ajax({
+		         url: '../CommentsServ', //요청페이지..
+		         method: 'get',
+		         data: {cmd: 'delete',
+		        	 id : id}, //'cmd=selectAll'
+		         success: deleteResult,
+		         error: function() {
+		            alert('에러발생!');
+		         }
+		      });
+	}
+	
+	//삭제 콜백함수.
+	function deleteResult(result){
+			console.log(result);
+			const xmlDoc = result;
+			const code = xmlDoc.getElementsByTagName('code')[0].firstChild.nodeValue;
+			if (code == 'success') {
+				const comment = JSON.parse(xmlDoc.getElementsByTagName('data')[0].firstChild.nodeValue);
+				const listDiv = $('#commentList'); //document.getElementById('commentList');
+				const oldCommentDiv = $('#'+ comment.id) //document.getElementById(comment.id);
+				oldCommentDiv.remove();	
+				//listDiv.removeChild(oldCommentDiv);
+				alert("삭제완료!");
+				
+			} else {
+				alert('에러발생!')
+			}
+	}
+	
+</script>
+</head>
+<body>
+	<div id='commentList'></div>
+	<!-- 글등록 -->
+	<div id = 'commentAdd'>
+		<form action='' name='addForm'>
+			이름: <input type='text' name='name' size='10'><br>
+			내용: <textarea name='content' cols='20' rows='2'></textarea>
+			<input type='button' value='등록' onclick='addComment()'>
+		</form>
+	</div>
+	
+	<!-- 글수정 -->
+	<div id='commentUpdate' style='display:none'>
+		<form action='' name='updateForm'>
+			<input type='hidden' name='id' value=''>
+			이름: <input type='text' name='name' size='10'><br>
+			내용: <textarea name='content' cols='20' rows='2'></textarea>
+			<input type ='button' value='변경' onclick='updateComment()'>
+			<input type ='button' value='취소' onclick='cancelUpdate()'>
+		</form>
+	
+	</div>
+	<script>
+	document.getElementById('commentList').innerHTML = '<h3>Hello</h3>';
+	</script>
+</body>
+</html>

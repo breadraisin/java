@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <title>comments.html</title>
 <script>
+
 	window.onload = function() {
 		loadCommentList();
 	}
+
 	
 	//목록조회..
 	function loadCommentList(){
@@ -36,16 +38,16 @@
 	}
 	
 	//한건을 화면보여줌.
-	function makeCommentView(comment){
+	function makeCommentView(comment) {
 		let div = document.createElement('div');
 		div.setAttribute('id', comment.id);
-		div.className = 'commenet';
-		let str = '<strong>' + comment.name + '</strong>' +
-					comment.content + 
-					'<input type="button" value="수정" onclick="viewUpdateForm('+comment.id+')">' +
-					'<input type="button" value="삭제" onclick="confirmDeletion('+comment.id+')" >';				
- 		div.innerHTML = str; //<div><strong>ddd</strong></div>
- 		return div;
+		div.className = 'comment';
+		div.comment = comment;	// {id:1,name:'user1',content='test'}
+		let str = '<strong>' + comment.name + '</strong>' + comment.content 
+				+ '<input type="button" value="수정" onclick="viewUpdateForm('+comment.id+')">'
+				+ '<input type="button" value="삭제" onclick="confirmDeletion('+comment.id+')">';
+		div.innerHTML = str; // <div><strong>ddd</strong></div>
+		return div;
 	}
 	
 	//한건 등록..
@@ -71,6 +73,7 @@
 		xhtp.onreadystatechange = addResult;
 	}
 	
+	//등록 콜백 함수
 	
 	function addResult() {
 		if(this.readyState == 4 && this.status == 200){
@@ -94,15 +97,86 @@
 	//수정화면
 	function viewUpdateForm(commentId){
 		let commentDiv = document.getElementById(commentId); //
-		let updateFormDiv = document.getElementById('');
-		
-		commentDiv.appendChild(updateFormDiv); //수정화면에 id기준으로 정보를 보여줌.
+		console.log(commentDiv);
+		console.log(commentDiv.comment);
+		let updateFormDiv = document.getElementById('commentUpdate');
+		commentDiv.after(updateFormDiv); //수정화면에 id기준으로 정보를 보여줌.
+
 		let comment = commentDiv.comment; // id, name, content 정보불러.
-		updateForm.name.value = comment.name;
+	
 		updateForm.id.value = comment.id;
-		updateForm.content.value = commnet.content;
+		updateForm.name.value = comment.name;
+		updateForm.content.value = comment.content;
 		updateFormDiv.style.display = 'block';
+	}
+	
+	//ajax 호출 수정.
+	function updateComment(){
+		const id = document.updateForm.id.value;
+		const name = document.updateForm.name.value;
+		const content = document.updateForm.content.value;
+		const param = '?cmd=update&id='+id+'&name='+name+'&content='+content;
+		const xhtp = new XMLHttpRequest();
+		xhtp.open('get','CommentsServ'+param);
+		xhtp.send();
+		xhtp.onreadystatechange = updateResult;
+	}
+	
+	//ajax 호출 콜백 함수
+	function updateResult() {
+		if(this.readyState == 4 && this.status == 200){
+			console.log(this.responseXML);
+			const xmlDoc = this.responseXML;
+			const code = xmlDoc.getElementsByTagName('code')[0].firstChild.nodeValue;
 		
+			if (code == 'success') {
+				const comment = JSON.parse(xmlDoc.getElementsByTagName('data')[0].firstChild.nodeValue);
+				const listDiv = document.getElementById('commentList');
+				const commentDiv = makeCommentView(comment);
+				const oldCommentDiv = document.getElementById(comment.id);
+				listDiv.replaceChild(commentDiv, oldCommentDiv);
+				alert("수정완료!");
+				document.getElementById('commentUpdate').style.display = 'none';
+				
+			} else {
+				alert('에러발생!')
+			}
+		
+		}
+	}
+	
+	//취소버튼.
+	function cancelUpdate(){
+		document.getElementById('commentUpdate').style.display = 'none';
+		
+	}
+	
+	//삭제처리
+	function confirmDeletion(id){
+		const xhtp = new XMLHttpRequest();
+		xhtp.open('get','CommentsServ?cmd=delete&id='+id);
+		xhtp.send();
+		xhtp.onreadystatechange = deleteResult;
+	}
+	
+	//삭제 콜백함수.
+	function deleteResult(){
+		if(this.readyState == 4 && this.status == 200){
+			console.log(this.responseXML);
+			const xmlDoc = this.responseXML;
+			const code = xmlDoc.getElementsByTagName('code')[0].firstChild.nodeValue;
+			if (code == 'success') {
+				const comment = JSON.parse(xmlDoc.getElementsByTagName('data')[0].firstChild.nodeValue);
+				const listDiv = document.getElementById('commentList');
+				const oldCommentDiv = document.getElementById(comment.id);
+				listDiv.removeChild(oldCommentDiv);
+				alert("삭제완료!");
+				
+			} else {
+				alert('에러발생!')
+			}
+		
+		}
 	}
 	
 </script>
@@ -129,5 +203,8 @@
 		</form>
 	
 	</div>
+	<script>
+	document.getElementById('commentList').innerHTML = '<h3>Hello</h3>';
+	</script>
 </body>
 </html>
